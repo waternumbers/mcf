@@ -29,12 +29,15 @@ NULL
 #' @rdname gpd
 #' @export
 dgpd <- function(x,a,b,log=FALSE){
-    a <- rep_len(a,length(x))
-    b <- rep_len(b,length(x))
+    n <- max(length(x),length(a),length(b))
+    x <- rep_len(x,n)
+    a <- rep_len(a,n)
+    b <- rep_len(b,n)
+    
     x[x<0 | b<=0] <- NA
     idx <- a!=0
     ## compute log density
-    x[!idx] <- -log(b[!idx]) ##case a==0
+    x[!idx] <- -(x[!idx]/b[!idx])-log(b[!idx]) ##case a==0
     x[idx] <- -log(b[idx]) + ((1/a[idx])-1)*log(1-a[idx]*x[idx]/b[idx]) ## case a!=0
     if(!log){
         x <- exp(x)
@@ -45,8 +48,10 @@ dgpd <- function(x,a,b,log=FALSE){
 #' @rdname gpd
 #' @export
 pgpd <- function(x,a,b){
-    a <- rep_len(a,length(x))
-    b <- rep_len(b,length(x))
+    n <- max(length(x),length(a),length(b))
+    x <- rep_len(x,n)
+    a <- rep_len(a,n)
+    b <- rep_len(b,n)
     x[x<0 | b<=0] <- NA
     idx <- a!=0
     x[idx] <- 1 - ( (1 - a[idx]*x[idx]/b[idx])^(1/a[idx]))
@@ -58,8 +63,10 @@ pgpd <- function(x,a,b){
 #' @rdname gpd
 #' @export
 qgpd <- function(q,a,b){
-    a <- rep_len(a,length(q))
-    b <- rep_len(b,length(q))
+    n <- max(length(q),length(a),length(b))
+    q <- rep_len(q,n)
+    a <- rep_len(a,n)
+    b <- rep_len(b,n)
     q[q<0 | q>1 | b<=0] <- NA
     idx <- a!=0
     q[idx] <- b[idx]*( 1 - (1-q[idx])^a[idx] )/a[idx]
